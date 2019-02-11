@@ -1,4 +1,5 @@
 import FluentSQLite
+import FluentMySQL
 import Authentication
 import Vapor
 
@@ -6,6 +7,7 @@ import Vapor
 public func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
     /// Register providers first
     try services.register(FluentSQLiteProvider())
+	try services.register(FluentMySQLProvider())
 	
 	/// Configure the authentication provider
 	try services.register(AuthenticationProvider())
@@ -30,9 +32,18 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
 	let databasePath = directory.workDir + "todos.db"
 	let sqlite = try SQLiteDatabase(storage: .file(path: databasePath))
 	
+	let mysqlConfig = MySQLDatabaseConfig(hostname: "mysql",
+										  port: 3306,
+										  username: "yuany",
+										  password: "yuany",
+										  database: "yuany",
+										  transport: .unverifiedTLS)
+	let mysql = MySQLDatabase(config: mysqlConfig)
+	
     /// Register the configured SQLite database to the database config.
     var databases = DatabasesConfig()
     databases.add(database: sqlite, as: .sqlite)
+	databases.add(database: mysql, as: .mysql)
     services.register(databases)
 
     /// Configure migrations
@@ -40,6 +51,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     migrations.add(model: User.self, database: .sqlite)
 	migrations.add(model: Token.self, database: .sqlite)
 	migrations.add(model: Todo.self, database: .sqlite)
+	migrations.add(model: Forum.self, database: .mysql)
     services.register(migrations)
 
 	/// Configure command
