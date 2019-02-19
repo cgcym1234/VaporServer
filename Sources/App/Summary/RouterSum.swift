@@ -27,7 +27,6 @@ class RouterSum {
 		
 		///给group添加参数
 //		但有时，我们添加到名字空间中的路由，有可能是动态的，例如，下面这两个HTTP API：
-//
 //		- POST /v1/episodes/1/play：表示播放id为1的视频；
 //		- POST /v1/episodes/1/finish：表示把id为1的视频标记为已完成；
 		router.group("v1") {
@@ -49,7 +48,6 @@ class RouterSum {
 		}
 		
 //		把group作为单独对象使用
-//
 //		上面这种嵌套路由的方式有一个缺陷，就是当一个名字空间里的路由较多时，group的closure就会很长，不方便维护。为此，我们可以把route group单独定义成对象：
 		router.group("v1") { group in
 			let subgroup = group.grouped("episodes", Int.parameter)
@@ -88,7 +86,9 @@ extension RouterSum: RouteCollection {
 	// MARK: - 注册route collection
 	///定义好RouteCollection之后，为了可以让Vapor在启动的时候加载它，我们需要在之前使用的routes方法中注册一下：
 	public func routes(_ router: Router) throws {
-		try router.register(collection: RouterSum())
+        ///下面2种方式注册
+        try router.register(collection: RouterSum())
+        try RouterSum().boot(router: router)
 	}
 }
 

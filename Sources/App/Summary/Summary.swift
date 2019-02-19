@@ -61,10 +61,6 @@ final class Summary {
 	Provider
 	
 	通过Provider协议可以更简单地整合外部服务到当前应用。像所有的Vapor官方包都使用它来展示它们的服务。Provider可以用来注册到Services结构体中，可以勾进容器的生命周期。
-	
-	import Foo
-	
-	try services.register(FooProvider())
 	*/
 	final class MyLoggerProvider: Provider {
 		func register(_ services: inout Services) throws {
