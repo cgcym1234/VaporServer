@@ -20,8 +20,8 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
         let mysqlPass: String
         
         if env == .development || env == .testing {
-            mysqlHost = "mysql"
-            mysqlPort = 3306
+            mysqlHost = "0.0.0.0"
+            mysqlPort = 33060
             mysqlDB = "yuany"
             mysqlUser = "yuany"
             mysqlPass = "yuany"
