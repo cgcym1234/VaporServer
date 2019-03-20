@@ -33,9 +33,13 @@ extension User: Validatable {
 	}
 }
 
-extension User: BasicAuthenticatable {
+extension User: PasswordAuthenticatable {
 	static var usernameKey: WritableKeyPath<User, String> = \.email
 	static var passwordKey: WritableKeyPath<User, String> = \.password
+}
+
+extension User: SessionAuthenticatable {
+    
 }
 
 extension User: TokenAuthenticatable {
