@@ -16,8 +16,9 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     
     try setupMiddleware(&config, &services)
     
-    /// Configure the authentication provider
-    try services.register(AuthenticationProvider())
+    try setupAuth(&services)
+    
+//    try setupConfig(&services)
 }
 
 private func setupRouter(_ services: inout Services) throws {
@@ -34,15 +35,21 @@ private func setupLeaf(_ config: inout Config, _ services: inout Services) throw
 }
 
 private func setupDatabase(_ env: inout Environment, _ services: inout Services) throws {
-    /// Register providers first
+    /// Register the configured SQLite database to the database config.
+    var databases = DatabasesConfig()
+    
+    /// SQLite
     try services.register(FluentSQLiteProvider())
-    try services.register(FluentMySQLProvider())
     
     let directory = DirectoryConfig.detect()
     services.register(directory)
     
     let databasePath = directory.workDir + "todos.db"
     let sqlite = try SQLiteDatabase(storage: .file(path: databasePath))
+    databases.add(database: sqlite, as: .sqlite)
+    
+    /// MySQL
+    try services.register(FluentMySQLProvider())
     
     let mysqlHost: String
     let mysqlPort: Int
@@ -72,10 +79,6 @@ private func setupDatabase(_ env: inout Environment, _ services: inout Services)
                                           database: mysqlDB,
                                           transport: .unverifiedTLS)
     let mysql = MySQLDatabase(config: mysqlConfig)
-    
-    /// Register the configured SQLite database to the database config.
-    var databases = DatabasesConfig()
-    databases.add(database: sqlite, as: .sqlite)
     databases.add(database: mysql, as: .mysql)
     
     services.register(databases)
@@ -87,6 +90,9 @@ private func setupMigration(_ services: inout Services) throws {
     migrations.add(model: User.self, database: .sqlite)
     migrations.add(model: Token.self, database: .sqlite)
     migrations.add(model: Todo.self, database: .sqlite)
+    
+    migrations.add(model: BasicUser.self, database: .sqlite)
+    
     migrations.add(model: Forum.self, database: .mysql)
     migrations.add(model: Message.self, database: .mysql)
     
@@ -114,5 +120,16 @@ private func setupMiddleware(_ config: inout Config, _ services: inout Services)
     services.register(middlewares)
     
     config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
+}
+
+private func setupConfig(_ services: inout Services) throws {
+    /// 更改项目的端口
+    let myService = NIOServerConfig.default(port: 8001)
+    services.register(myService)
+}
+
+private func setupAuth(_ services: inout Services) throws {
+     /// Configure the authentication provider
+    try services.register(AuthenticationProvider())
 }
 

@@ -1,4 +1,6 @@
-import Vapor
+@_exported import Vapor
+@_exported import FluentSQL
+@_exported import Crypto
 
 /// Creates an instance of Application. This is called from main.swift in the run target.
 public func app(_ env: Environment) throws -> Application {
