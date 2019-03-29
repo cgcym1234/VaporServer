@@ -1,5 +1,5 @@
 //
-//  JsonCRUD.swift
+//  JsonCRUDController.swift
 //  App
 //
 //  Created by yuany on 2019/3/21.
@@ -8,28 +8,7 @@
 import Vapor
 
 
-extension JsonCRUD {
-    enum Path: String, PathComponentsRepresentable {
-        case group = "json"
-        case users
-        
-        var relativePath: String {
-            switch self {
-            case .group:
-                return "/\(rawValue)"
-            default:
-                return "/\(Path.group.rawValue)/\(rawValue)"
-            }
-        }
-        
-        func convertToPathComponents() -> [PathComponent] {
-            return [.init(stringLiteral: self.rawValue)]
-        }
-    }
-}
-
-
-extension JsonCRUD: RouteCollection {
+extension JsonCRUDController: RouteCollection {
     func boot(router: Router) throws {
         let sub = router.grouped(Path.group)
         
@@ -42,8 +21,7 @@ extension JsonCRUD: RouteCollection {
     }
 }
 
-final class JsonCRUD {
-    
+final class JsonCRUDController {
     func list(_ req: Request) throws -> Future<[User]> {
         return User.query(on: req).all()
     }
@@ -68,6 +46,26 @@ final class JsonCRUD {
             .next(User.self)
             .flatMap { $0.delete(on: req) }
             .transform(to: .ok)
+    }
+}
+
+extension JsonCRUDController {
+    enum Path: String, PathComponentsRepresentable {
+        case group = "json"
+        case users
+        
+        var relativePath: String {
+            switch self {
+            case .group:
+                return "/\(rawValue)"
+            default:
+                return "/\(Path.group.rawValue)/\(rawValue)"
+            }
+        }
+        
+        func convertToPathComponents() -> [PathComponent] {
+            return [.init(stringLiteral: self.rawValue)]
+        }
     }
 }
 

@@ -22,7 +22,7 @@ final class BasicAuthController: RouteCollection {
         let authedGroup = group.grouped(middleWare)
         authedGroup.post(Path.login, use: login)
         
-        /// curl -H “Authorization: Basic emVsZGFAaHlydWxlLmNvbTpteWhlcm9pc2xpbms=” http://localhost:8080/basic/profile
+        /// curl -H "Authorization: Basic emVsZGFAaHlydWxlLmNvbTpteWhlcm9pc2xpbms=" http://localhost:8080/basic/profile
         authedGroup.get(Path.profile, use: profile)
     }
 }
@@ -30,7 +30,7 @@ final class BasicAuthController: RouteCollection {
 private extension BasicAuthController {
     func register(_ req: Request) throws -> Future<BasicUser.Public> {
         return try req.content
-            .decode(User.self)
+            .decode(BasicUser.self)
             .flatMap { user in
                 let hasher = try req.make(BCryptDigest.self)
                 let password = try hasher.hash(user.password)

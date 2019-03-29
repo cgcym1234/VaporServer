@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>CRUD</title>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+            </head>
+    <body class="container">
+        <h1 class="text-center"> CRUD </h1>
+        <div class="row">
+            
+            <div class="col-xs-12 col-sm-3">
+                <h2>Create</h2>
+                <form method="POST" action="/users">
+                    <div class="input-group">
+                        <input type="text" name="username" class="form-control">
+                            <span class="input-group-btn">
+                                <input class="btn btn-success" type="submit" value="create" />
+                            </span>
+                            </div>
+                </form>
+            </div>
+            <div class="col-xs-12 col-sm-3">
+                <h2>Read</h2>
+                #for(userView in userViewlist) {
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <input type="text" name="username" class="form-control" value="#(userView.user.username)" disabled>
+                                #for(pokemon in userView.pokemons) {
+                                <li>#(pokemon.name)
+                                    }
+                                    </div>
+                    </div>
+                </div>
+                }
+            </div>
+            <div class="col-xs-12 col-sm-3">
+                <h2>Update</h2>
+                #for(userView in userViewlist) {
+                <form method="POST" action="/users/#(userView.user.id)/update">
+                    <div class="input-group form-group">
+                        <input type="text" name="username" class="form-control" value="#(userView.user.username)">
+                            <span class="input-group-btn">
+                                <input class="btn btn-primary" type="submit" value="update" />
+                            </span>
+                            </div>
+                </form>
+                }
+            </div>
+            <div class="col-xs-12 col-sm-3">
+                <h2>Delete</h2>
+                #for(userView in userViewlist) {
+                <form method="POST" action="users/#(userView.user.id)/delete">
+                    <div class="form-group input-group">
+                        <input type="text" name="username" class="form-control" value="#(userView.user.username)" disabled>
+                            <span class="input-group-btn">
+                                <input class="btn btn-danger" type="submit" value="delete" />
+                            </span>
+                            </div>
+                </form>
+                }
+            </div>
+        </div>
+        
+        <h1 class="text-center">Pokemon</h1>
+        <div class="row">
+            <div class="col-xs-12">
+                
+                <form method="POST" action="/pokemon" id="pokemon-form">
+                    
+                    <div class="form-group">
+                        <h4>User</h4>
+                        <select class="form-control" name="userId" form="pokemon-form">
+                            #for(userView in userViewlist) {
+                            <option value="#(userView.user.id)">#(userView.user.username)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <h4>Name</h4>
+                        <input type="text" name="name" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <h4>Level</h4>
+                        <input type="text" name="level" class="form-control" />
+                    </div>
+                    <input type="submit" value="create" class="form-control btn btn-success"/>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>

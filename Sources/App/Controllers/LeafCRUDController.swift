@@ -1,5 +1,5 @@
 //
-//  LeafCRUD.swift
+//  LeafCRUDController.swift
 //  App
 //
 //  Created by yuany on 2019/3/21.
@@ -7,30 +7,7 @@
 
 import Vapor
 
-
-extension LeafCRUD {
-    enum Path: String, PathComponentsRepresentable {
-        case leaf
-        case users
-        
-        
-        var relativePath: String {
-            switch self {
-            case .leaf:
-                return "/\(rawValue)"
-            default:
-                return "/\(Path.leaf.rawValue)/\(rawValue)"
-            }
-        }
-        
-        func convertToPathComponents() -> [PathComponent] {
-            return [.init(stringLiteral: self.rawValue)]
-        }
-    }
-}
-
-
-extension LeafCRUD {
+extension LeafCRUDController: RouteCollection {
     func boot(router: Router) throws {
         let sub = router.grouped(Path.leaf)
         
@@ -43,15 +20,7 @@ extension LeafCRUD {
     }
 }
 
-final class LeafCRUD {
-    enum Leaf: String {
-        case crud
-        
-        var name: String {
-            return rawValue
-        }
-    }
-    
+final class LeafCRUDController {
     func list(_ req: Request) throws -> Future<View> {
         let allUsers = User.query(on: req).all()
         
@@ -86,3 +55,34 @@ final class LeafCRUD {
         }
     }
 }
+
+
+private extension LeafCRUDController {
+    enum Leaf: String {
+        case crud
+        
+        var name: String {
+            return rawValue
+        }
+    }
+    
+    enum Path: String, PathComponentsRepresentable {
+        case leaf
+        case users
+        
+        
+        var relativePath: String {
+            switch self {
+            case .leaf:
+                return "/\(rawValue)"
+            default:
+                return "/\(Path.leaf.rawValue)/\(rawValue)"
+            }
+        }
+        
+        func convertToPathComponents() -> [PathComponent] {
+            return [.init(stringLiteral: self.rawValue)]
+        }
+    }
+}
+

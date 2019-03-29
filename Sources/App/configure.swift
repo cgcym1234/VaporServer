@@ -92,6 +92,9 @@ private func setupMigration(_ services: inout Services) throws {
     migrations.add(model: Todo.self, database: .sqlite)
     
     migrations.add(model: BasicUser.self, database: .sqlite)
+    migrations.add(model: TokenUser.self, database: .sqlite)
+    migrations.add(model: TokenToken.self, database: .sqlite)
+    migrations.add(model: Pokemon.self, database: .sqlite)
     
     migrations.add(model: Forum.self, database: .mysql)
     migrations.add(model: Message.self, database: .mysql)
