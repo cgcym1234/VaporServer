@@ -9,7 +9,7 @@ import Foundation
 
 final class OneToManyControlelr: RouteCollection {
     func boot(router: Router) throws {
-        let group = router.grouped(Path.group)
+        let group = router.grouped(Path.api)
         
         group.get(Path.users, use: list)
         group.post(Path.create, use: create)
@@ -71,17 +71,17 @@ private extension OneToManyControlelr {
     }
     
     enum Path: String, PathComponentsRepresentable {
-        case group = "pokemon"
+        case api = "pokemon"
         case create
         case delete
         case users
         
         var relativeValue: String {
             switch self {
-            case .group:
+            case .api:
                 return rawValue
             default:
-                return "\(Path.group.rawValue)/\(rawValue)"
+                return "\(Path.api.rawValue)/\(rawValue)"
             }
         }
         

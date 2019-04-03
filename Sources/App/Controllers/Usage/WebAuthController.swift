@@ -9,7 +9,7 @@ import Authentication
 
 final class WebAuthController: RouteCollection {
     func boot(router: Router) throws {
-        let webAuth = router.grouped(Path.group)
+        let webAuth = router.grouped(Path.api)
         
         webAuth.get(Path.register, use: renderRegister)
         webAuth.post(Path.register, use: register)
@@ -86,7 +86,7 @@ private extension WebAuthController {
 
 extension WebAuthController {
     enum Path: String, PathComponentsRepresentable {
-        case group = "web"
+        case api = "web"
         case register
         case login
         case profile
@@ -94,10 +94,10 @@ extension WebAuthController {
         
         var relativeValue: String {
             switch self {
-            case .group:
+            case .api:
                 return rawValue
             default:
-                return "\(Path.group.rawValue)/\(rawValue)"
+                return "\(Path.api.rawValue)/\(rawValue)"
             }
         }
         

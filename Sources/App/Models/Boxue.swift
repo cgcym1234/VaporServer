@@ -45,7 +45,7 @@ extension Forum {
         static func prepare(on conn: Database.Connection) -> Future<Void> {
             return [1, 2, 3]
                 .map { i in
-                    Forum(name: "Forum \(i!)")
+                    Forum(name: "Forum \(i)")
                 }
                 .map { $0.save(on: conn) }
                 .flatten(on: conn)

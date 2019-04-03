@@ -9,7 +9,7 @@ import Vapor
 
 extension LeafCRUDController: RouteCollection {
     func boot(router: Router) throws {
-        let sub = router.grouped(Path.leaf)
+        let sub = router.grouped(Path.api)
         
         sub.get(Path.users, use: list)
         sub.post(Path.users, use: create)
@@ -67,16 +67,16 @@ private extension LeafCRUDController {
     }
     
     enum Path: String, PathComponentsRepresentable {
-        case leaf
+        case api = "leaf"
         case users
         
         
         var relativePath: String {
             switch self {
-            case .leaf:
+            case .api:
                 return "/\(rawValue)"
             default:
-                return "/\(Path.leaf.rawValue)/\(rawValue)"
+                return "/\(Path.api.rawValue)/\(rawValue)"
             }
         }
         

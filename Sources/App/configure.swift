@@ -125,14 +125,15 @@ private func setupMiddleware(_ config: inout Config, _ services: inout Services)
     config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
 }
 
+private func setupAuth(_ services: inout Services) throws {
+    /// Configure the authentication provider
+    try services.register(AuthenticationProvider())
+}
+
 private func setupConfig(_ services: inout Services) throws {
     /// 更改项目的端口
     let myService = NIOServerConfig.default(port: 8001)
     services.register(myService)
 }
 
-private func setupAuth(_ services: inout Services) throws {
-     /// Configure the authentication provider
-    try services.register(AuthenticationProvider())
-}
 

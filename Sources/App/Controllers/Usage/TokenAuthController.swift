@@ -11,7 +11,7 @@ import Random
 
 final class TokenAuthController: RouteCollection {
     func boot(router: Router) throws {
-        let group = router.grouped(Path.group)
+        let group = router.grouped(Path.api)
         
         ///curl -H "Content-Type: application/json" -X POST -d '{"email":"zelda@hyrule.com", "password": "link"}' http://localhost:8080/token/register
         group.post(Path.register, use: register)
@@ -91,7 +91,7 @@ private extension TokenAuthController {
 
 extension TokenAuthController {
     enum Path: String, PathComponentsRepresentable {
-        case group = "token"
+        case api = "token"
         case register
         case login
         case profile
@@ -99,10 +99,10 @@ extension TokenAuthController {
         
         var relativeValue: String {
             switch self {
-            case .group:
+            case .api:
                 return rawValue
             default:
-                return "\(Path.group.rawValue)/\(rawValue)"
+                return "\(Path.api.rawValue)/\(rawValue)"
             }
         }
         

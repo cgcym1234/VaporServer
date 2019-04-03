@@ -10,7 +10,7 @@ import Vapor
 
 extension JsonCRUDController: RouteCollection {
     func boot(router: Router) throws {
-        let sub = router.grouped(Path.group)
+        let sub = router.grouped(Path.api)
         
         sub.get(Path.users, use: list)
         sub.post(Path.users, use: create)
@@ -51,15 +51,15 @@ final class JsonCRUDController {
 
 extension JsonCRUDController {
     enum Path: String, PathComponentsRepresentable {
-        case group = "json"
+        case api = "json"
         case users
         
         var relativePath: String {
             switch self {
-            case .group:
+            case .api:
                 return "/\(rawValue)"
             default:
-                return "/\(Path.group.rawValue)/\(rawValue)"
+                return "/\(Path.api.rawValue)/\(rawValue)"
             }
         }
         

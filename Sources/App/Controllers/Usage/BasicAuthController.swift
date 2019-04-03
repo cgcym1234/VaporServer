@@ -10,7 +10,7 @@ import FluentSQLite
 
 final class BasicAuthController: RouteCollection {
     func boot(router: Router) throws {
-        let group = router.grouped(Path.group)
+        let group = router.grouped(Path.api)
         
         ///curl -H "Content-Type: application/json" -X POST -d '{"email":"zelda@hyrule.com", "password": "myheroislink"}' http://localhost:8080/basic/register
         group.post(Path.register, use: register)
@@ -55,7 +55,7 @@ private extension BasicAuthController {
 
 extension BasicAuthController {
     enum Path: String, PathComponentsRepresentable {
-        case group = "basic"
+        case api = "basic"
         case register
         case login
         case profile
@@ -63,10 +63,10 @@ extension BasicAuthController {
         
         var relativeValue: String {
             switch self {
-            case .group:
+            case .api:
                 return rawValue
             default:
-                return "\(Path.group.rawValue)/\(rawValue)"
+                return "\(Path.api.rawValue)/\(rawValue)"
             }
         }
         

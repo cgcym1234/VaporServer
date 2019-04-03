@@ -19,7 +19,7 @@ enum Path: String {
 
 extension Path: PathComponentsRepresentable {
 	func convertToPathComponents() -> [PathComponent] {
-		return [.init(stringLiteral: self.rawValue)]
+		return [.init(stringLiteral: rawValue)]
 	}
 }
 
