@@ -1,5 +1,5 @@
 //
-//  Authentication.swift
+//  AuthService.swift
 //  App
 //
 //  Created by yuany on 2019/4/10.
@@ -9,8 +9,8 @@ import Foundation
 import FluentMySQL
 import Crypto
 
-extension AuthenticationService {
-    struct Container: Content {
+extension AuthService {
+    struct Public: Content {
         let accessToken: AccessToken.Token
         let expiresIn: TimeInterval
         let refreshToken: RefreshToken.Token
@@ -23,7 +23,7 @@ extension AuthenticationService {
     }
 }
 
-final class AuthenticationService {
+final class AuthService {
     func authentication(for refreshToken: RefreshToken.Token, on req: Request) throws -> Future<Response> {
         return try user(matching: refreshToken, on: req)
             .unwrap(or: Api.Code.userNotExist.error)
@@ -36,11 +36,11 @@ final class AuthenticationService {
         throws -> Future<Response> {
             return try removeAllTokens(for: userId, on: req).flatMap { _ in
                 try map(
-                    to: Container.self,
+                    to: Public.self,
                     self.accessToken(for: userId, on: req),
                     self.refreshToken(for: userId, on: req)
                 ) { access, refresh in
-                    return Container(accessToken: access, refreshToken: refresh)
+                    return Public(accessToken: access, refreshToken: refresh)
                     }
                     .toJson(on: req)
             }
@@ -63,7 +63,7 @@ final class AuthenticationService {
 }
 
 // MARK: - User
-private extension AuthenticationService {
+private extension AuthService {
     func user(matching token: RefreshToken.Token, on conn: DatabaseConnectable)
         throws -> Future<User?> {
             return RefreshToken
@@ -89,7 +89,7 @@ private extension AuthenticationService {
 }
 
 // MARK: - Token
-private extension AuthenticationService {
+private extension AuthService {
     func accessToken(for userId: User.ID, on conn: DatabaseConnectable)
         throws -> Future<AccessToken> {
             return try AccessToken(userId: userId).save(on: conn)

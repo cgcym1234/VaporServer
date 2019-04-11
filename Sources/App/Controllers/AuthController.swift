@@ -14,7 +14,7 @@ import Authentication
 // 由于access_token默认有效时间为一小时, refreshToken 有效期为三年,所以需要先获取refreshToken, 然后将其保存, 以后每次就可以不用去阿里云认证就可以用 refreshToken 换取 AccessToken
 final class AuthController: RouteCollection {
     
-    private let authService = AuthenticationService()
+    private let authService = AuthService()
     
 	func boot(router: Router) throws {
         let group = router.grouped(Api.Path.token)

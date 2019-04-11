@@ -71,15 +71,20 @@ extension User: TokenAuthenticatable {
 
 
 // MARK: - Customer
-extension User {
-	struct UpdateRequest: Content {
-		var name: String?
-		var email: String?
-		var password: String?
-	}
-    
+extension User: PublicType {
     struct Public: Content {
         let email: String
     }
+    
+    var `public`: Public {
+        return Public(email: email!)
+    }
 }
 
+extension User {
+    struct UpdateRequest: Content {
+        var name: String?
+        var email: String?
+        var password: String?
+    }
+}

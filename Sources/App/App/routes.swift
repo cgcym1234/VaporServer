@@ -4,7 +4,9 @@ import Authentication
 /// Register your application's routes here.
 public func routes(_ router: Router) throws {
     /// 2种注册方式，一样的
+    try BoxueController().boot(router: router)
     try router.register(collection: BoxueController())
+    
     try router.register(collection: WebAuthController())
     try router.register(collection: BasicAuthController())
     try router.register(collection: TokenAuthController())
@@ -14,7 +16,8 @@ public func routes(_ router: Router) throws {
     
     /// my demo
     let api = router.grouped(Api.Path.api)
-    try AuthController().boot(router: api)
+    try api.register(collection: AuthController())
+    
     try UserController().boot(router: api)
     try TodoController().boot(router: api)
 }
