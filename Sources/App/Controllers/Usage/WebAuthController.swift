@@ -6,6 +6,7 @@
 //
 
 import Authentication
+import FluentSQLite
 
 final class WebAuthController: RouteCollection {
     func boot(router: Router) throws {
@@ -16,7 +17,7 @@ final class WebAuthController: RouteCollection {
         webAuth.get(Path.login, use: renderLogin)
         webAuth.get(Path.logout, use: logout)
         
-        let authSessionRouter = webAuth.grouped(User.authSessionsMiddleware())
+        let authSessionRouter = webAuth.grouped(WebAuthUser.authSessionsMiddleware())
         authSessionRouter.post(Path.login, use: login)
         
         let protectedRouter = authSessionRouter.grouped(RedirectMiddleware<User>(path: Path.login.relativePath))
@@ -56,8 +57,8 @@ private extension WebAuthController {
     }
     
     func login(_ req: Request) throws -> Future<Response> {
-        return try req.content.decode(User.self).flatMap { user in
-            return User.authenticate(
+        return try req.content.decode(WebAuthUser.self).flatMap { user in
+            return WebAuthUser.authenticate(
                 username: user.email,
                 password: user.password,
                 using: BCryptDigest(),
@@ -74,12 +75,12 @@ private extension WebAuthController {
     }
     
     func renderProfile(_ req: Request) throws -> Future<View> {
-        let user = try req.requireAuthenticated(User.self)
+        let user = try req.requireAuthenticated(WebAuthUser.self)
         return try req.view().render("profile", ["user": user])
     }
     
     func logout(_ req: Request) throws -> Future<Response> {
-        try req.unauthenticateSession(User.self)
+        try req.unauthenticateSession(WebAuthUser.self)
         return Future.map(on: req) { req.redirect(to: Path.logout.relativePath) }
     }
 }
@@ -123,3 +124,26 @@ extension WebAuthController {
         }
     }
 }
+
+
+struct WebAuthUser: SQLiteModel {
+    var id: Int?
+    var email: String
+    var password: String
+    
+    init(id: Int? = nil, email: String, password: String) {
+        self.id = id
+        self.email = email
+        self.password = password
+    }
+}
+
+extension WebAuthUser: Content {}
+extension WebAuthUser: Migration {}
+
+extension WebAuthUser: PasswordAuthenticatable {
+    static var usernameKey: WritableKeyPath<WebAuthUser, String> = \.email
+    static var passwordKey: WritableKeyPath<WebAuthUser, String> = \.password
+}
+
+extension WebAuthUser: SessionAuthenticatable {}

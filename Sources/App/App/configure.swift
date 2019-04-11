@@ -87,14 +87,19 @@ private func setupDatabase(_ env: inout Environment, _ services: inout Services)
 private func setupMigration(_ services: inout Services) throws {
     /// Configure migrations
     var migrations = MigrationConfig()
-    migrations.add(model: User.self, database: .sqlite)
-    migrations.add(model: Token.self, database: .sqlite)
-    migrations.add(model: Todo.self, database: .sqlite)
     
     migrations.add(model: BasicUser.self, database: .sqlite)
-    migrations.add(model: TokenUser.self, database: .sqlite)
-    migrations.add(model: TokenToken.self, database: .sqlite)
+    migrations.add(model: WebAuthUser.self, database: .sqlite)
+    migrations.add(model: TokenAuthUser.self, database: .sqlite)
+    migrations.add(model: TokenAuthToken.self, database: .sqlite)
     migrations.add(model: Pokemon.self, database: .sqlite)
+    
+    migrations.add(model: User.self, database: .mysql)
+    migrations.add(model: UserAuth.self, database: .mysql)
+    migrations.add(model: RefreshToken.self, database: .mysql)
+    migrations.add(model: AccessToken.self, database: .mysql)
+    migrations.add(model: Token.self, database: .sqlite)
+    migrations.add(model: Todo.self, database: .sqlite)
     
     migrations.add(model: Forum.self, database: .mysql)
     migrations.add(model: Message.self, database: .mysql)

@@ -8,33 +8,32 @@
 import Vapor
 import Crypto
 import FluentSQLite
+import Authentication
 
+// 由于access_token默认有效时间为一小时, 所以每隔一小时需要点击从而刷新令牌,就是使用refresh_token 换取了一个新的 access_token.
+// 由于access_token默认有效时间为一小时, refreshToken 有效期为三年,所以需要先获取refreshToken, 然后将其保存, 以后每次就可以不用去阿里云认证就可以用 refreshToken 换取 AccessToken
 final class AuthController: RouteCollection {
+    
+    private let authService = AuthenticationService()
+    
 	func boot(router: Router) throws {
-		let auth = router.grouped(Path.auth)
-		// Create new user
-		auth.post(User.self, at: Path.register, use: registerHandler)
-		
-		/// Login
-		let authMid = User.basicAuthMiddleware(using: BCryptDigest())
-		let authGroup = auth.grouped(authMid)
-		authGroup.post(Path.login, use: loginHandler)
+        let group = router.grouped(Api.Path.token)
+        group.post(RefreshToken.Public.self, at: Api.Path.refresh, use: refreshAccessTokenHandler)
+        
+        let basicAuthMiddleware = UserAuth.basicAuthMiddleware(using: BCrypt)
+        let guardAuthMiddleware = User.guardAuthMiddleware()
+        let basiceAuthGroup = group.grouped([basicAuthMiddleware, guardAuthMiddleware])
+        basiceAuthGroup.post(User.Public.self, at: Api.Path.revoke, use: accessTokenRevokeHandler)
 	}
 }
 
 private extension AuthController {
-	func registerHandler(req: Request, user: User) throws -> Future<User.Public> {
-		try user.validate()
-		let digest = try req.make(BCryptDigest.self)
-		let hashedPassword = try digest.hash(user.password)
-		user.password = hashedPassword
-		return user.save(on: req).public
+	func refreshAccessTokenHandler(req: Request, token: RefreshToken.Public) throws -> Future<Response> {
+		return try authService.authentication(for: token.refreshToken, on: req)
 	}
 	
-	func loginHandler(_ req: Request) throws -> Future<Token.Public> {
-		guard let user = try? req.requireAuthenticated(User.self) else {
-			throw Abort(.unauthorized, reason: "Invalid email or password")
-		}
-		return try Token.create(userId: user.requireID()).save(on: req).public
-	}
+    func accessTokenRevokeHandler(req: Request, user: User.Public) throws -> Future<HTTPResponseStatus> {
+        return try authService.revokeTokens(forEmail: user.email, on: req)
+        .transform(to: .noContent)
+    }
 }

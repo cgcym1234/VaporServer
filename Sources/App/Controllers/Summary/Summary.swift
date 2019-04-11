@@ -5,17 +5,40 @@
 //  Created by yangyuan on 2018/9/6.
 //
 
-import Foundation
+import FluentSQLite
 import Vapor
 
 ///经过了解基础的概念后，可以再深一步来了解这些概念存在的意义和扩展的使用方法，包括Service、Client、Content、Session。
 final class Summary {
-	
-	/*
-	Service
-	
-	Service是一个依赖注入的框架，以可维护的方式来进行注册、配置和创建应用依赖。其实Vapor里的这个Service的概念有点像iOS里面组件化的解耦方案，使用路由或者协议建立起一个调度中心，去给有功能调用需求的地方分发服务。那应用到的组件就不会散落在项目的各处，同时可以针对自己需要的情景、功能来配置、选择对应的服务。
-	*/
+    struct User: Content {
+        var name: String
+        var email: String
+        var password: String
+    }
+    
+    enum Path: String, PathComponentsRepresentable {
+        case api
+        case auth
+        case login
+        case register
+        case users
+        case todos
+        case search
+        
+        func convertToPathComponents() -> [PathComponent] {
+            return [.init(stringLiteral: rawValue)]
+        }
+    }
+}
+
+// MARK: - Service
+
+/*
+ Service是一个依赖注入的框架，以可维护的方式来进行注册、配置和创建应用依赖。
+ 其实Vapor里的这个Service的概念有点像iOS里面组件化的解耦方案，使用路由或者协议建立起一个调度中心，去给有功能调用需求的地方分发服务。
+ 那应用到的组件就不会散落在项目的各处，同时可以针对自己需要的情景、功能来配置、选择对应的服务。
+ */
+extension Summary {
 	///首先遵从一个空的协议Service（拿MyPrintLogger来举例）
 	final class MyPrintLogger: Logger, Service {
 		func log(_ string: String, at level: LogLevel, file: String, function: String, line: UInt, column: UInt) {
@@ -56,12 +79,16 @@ final class Summary {
 		let logger = try req.make(Logger.self)
 		print(type(of: logger)) // MyPrintLogger2
 	}
-	
-	/*
-	Provider
-	
-	通过Provider协议可以更简单地整合外部服务到当前应用。像所有的Vapor官方包都使用它来展示它们的服务。Provider可以用来注册到Services结构体中，可以勾进容器的生命周期。
-	*/
+}
+
+// MARK: - Provider
+
+/*
+ 通过Provider协议可以更简单地整合外部服务到当前应用。
+ 像所有的Vapor官方包都使用它来展示它们的服务。
+ Provider可以用来注册到Services结构体中，可以勾进容器的生命周期。
+ */
+extension Summary {
 	final class MyLoggerProvider: Provider {
 		func register(_ services: inout Services) throws {
 			services.register(MyPrintLogger2.self)
@@ -74,13 +101,15 @@ final class Summary {
 		}
 	}
 	///实现Provider协议后，当注册LoggerProvider到应用的Services结构体中，它就会自动注册上面的两个服务。同时当容器启动的时候，就可以验证provider是否已经添加（注册服务）了。
-	
-	
-	/*
-	Client
-	
-	作为客户端使用时，首先需要一个服务容器（Container）来创建客户端。通常如果像进入你服务器的请求结果一样请求外部API，你就应该使用请求容器来创建一个客户端
-	*/
+}
+
+// MARK: - Client
+
+/*
+ 作为客户端使用时，首先需要一个服务容器（Container）来创建客户端。
+ 通常如果像进入你服务器的请求结果一样请求外部API，你就应该使用请求容器来创建一个客户端
+ */
+extension Summary {
 	func client(_ req: Request, _ services: inout Services) throws {
 		///只要容器（app、req）就能创建客户端
 		let res = try req.client().get("http://vapor.codes")
@@ -89,15 +118,17 @@ final class Summary {
 		///发送请求
 		_ = try req.client().send(req)
 	}
+}
+
+// MARK: - Content
+
+/*
+ 有对应的编码器或解码器指定，模型才会按特定的序列形式在HTTP上进行通讯。
+ 因为所有的HTTP请求都必须包含content type，所以Vapor能根据这自动选择合适的编码器或者报错。
+ 同时也可以在应用的配置设定Vapor默认的编码器和解码器
+ */
+extension Summary {
 	
-	
-	/*
-	Content
-	
-	有对应的编码器或解码器指定，模型才会按特定的序列形式在HTTP上进行通讯。
-	
-	因为所有的HTTP请求都必须包含content type，所以Vapor能根据这自动选择合适的编码器或者报错。同时也可以在应用的配置设定Vapor默认的编码器和解码器
-	*/
 	func content(services: inout Services) {
 		/// Create default content config
 		var contentConfig = ContentConfig.default()
@@ -194,14 +225,19 @@ final class Summary {
 		// Decode JSON using custom date encoding strategy
 		_ = try req.content.decode(json: User.self, using: .custom(dates: .millisecondsSince1970))
 	}
-	
-	/*
-	Session
-	
-	session 主要是维护客户端的连接状态，其通过为每个客户端创建唯一标识，并要求客户端在每一次请求中提供这个标识。这个标识可以利用任何的格式传递，但基本上都是使用cookies来完成。
-	
-	当一个新客户端的连接和session数据设置后，Vapor返回一个用于设置Cookieheader的值，然后客户端就会被要求在每次请求的Cookieheader上重复返回该值，所有浏览器都会自动完成这个流程。如果你想让session失效，Vapor就会删除相关的所有数据并通知客户端它们的cookie已经不再有效。
-	*/
+}
+
+// MARK: - Session
+
+/*
+ session 主要是维护客户端的连接状态，其通过为每个客户端创建唯一标识，
+ 并要求客户端在每一次请求中提供这个标识。
+ 这个标识可以利用任何的格式传递，但基本上都是使用cookies来完成。
+ 
+ 当一个新客户端的连接和session数据设置后，Vapor返回一个用于设置Cookieheader的值，然后客户端就会被要求在每次请求的Cookieheader上重复返回该值，所有浏览器都会自动完成这个流程。
+ 如果你想让session失效，Vapor就会删除相关的所有数据并通知客户端它们的cookie已经不再有效。
+ */
+extension Summary {
 	func sessionDemo(_ req: Request, _ services: inout Services, router: Router) throws {
 		///要实现session的功能，首先要将中间件MiddlewareConfig配置到全局
 		
@@ -220,7 +256,8 @@ final class Summary {
 		}
 		
 		/*
-		Vapor 默认下会将sessions保持在内存，也可以在配置中重写这个形式。还能使用Fluent的数据库或缓存来持久化sessions。
+		Vapor 默认下会将sessions保持在内存，也可以在配置中重写这个形式。
+        还能使用Fluent的数据库或缓存来持久化sessions。
 		
 		当中间件生效后，就可以使用req.session()去访问
 		*/

@@ -5,7 +5,7 @@
 //  Created by yuany on 2019/3/26.
 //
 
-import Foundation
+import FluentSQLite
 
 final class OneToManyControlelr: RouteCollection {
     func boot(router: Router) throws {

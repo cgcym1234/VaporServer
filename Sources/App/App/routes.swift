@@ -12,7 +12,8 @@ public func routes(_ router: Router) throws {
     try router.register(collection: JsonCRUDController())
     try router.register(collection: OneToManyControlelr())
     
-    let api = router.grouped(Path.api)
+    /// my demo
+    let api = router.grouped(Api.Path.api)
     try AuthController().boot(router: api)
     try UserController().boot(router: api)
     try TodoController().boot(router: api)

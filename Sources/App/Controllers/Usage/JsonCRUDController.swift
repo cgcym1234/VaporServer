@@ -6,7 +6,7 @@
 //
 
 import Vapor
-
+import FluentSQLite
 
 extension JsonCRUDController: RouteCollection {
     func boot(router: Router) throws {

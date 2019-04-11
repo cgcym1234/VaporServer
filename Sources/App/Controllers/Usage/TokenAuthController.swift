@@ -19,7 +19,7 @@ final class TokenAuthController: RouteCollection {
         ///curl -H "Content-Type: application/json" -X POST -d '{"email":"zelda@hyrule.com", "password": "link"}' http://localhost:8080/token/login
         group.post(Path.login, use: login)
         
-        let tokenAuth = TokenUser.tokenAuthMiddleware()
+        let tokenAuth = TokenAuthUser.tokenAuthMiddleware()
         let authRoutes = group.grouped(tokenAuth)
         
         /// curl -H "Authorization: Bearer i4dl7fNpUD+iZuaUhbppMRRNM4m3ZNA/kxLMklcwjO8=" http://localhost:8080/token/profile
@@ -30,25 +30,25 @@ final class TokenAuthController: RouteCollection {
 }
 
 private extension TokenAuthController {
-    func register(_ req: Request) throws -> Future<TokenUser.Public> {
+    func register(_ req: Request) throws -> Future<TokenAuthUser.Public> {
         return try req.content
-            .decode(TokenUser.self)
+            .decode(TokenAuthUser.self)
             .flatMap { user in
                 let hasher = try req.make(BCryptDigest.self)
                 let password = try hasher.hash(user.password)
-                let newUser = TokenUser(email: user.email, password: password)
+                let newUser = TokenAuthUser(email: user.email, password: password)
                 
                 return newUser.save(on: req).map {
-                    TokenUser.Public(id: try $0.requireID(), email: $0.email)
+                    TokenAuthUser.Public(id: try $0.requireID(), email: $0.email)
                 }
         }
     }
     
-    func login(_ req: Request) throws -> Future<TokenToken> {
+    func login(_ req: Request) throws -> Future<TokenAuthToken> {
         return try req.content
-            .decode(TokenUser.self)
+            .decode(TokenAuthUser.self)
             .flatMap { user in
-                return TokenUser.query(on: req)
+                return TokenAuthUser.query(on: req)
                     .filter(\.email == user.email)
                     .first()
                     .flatMap { fetchedUser in
@@ -59,12 +59,12 @@ private extension TokenAuthController {
                         let hasher = try req.make(BCryptDigest.self)
                         if try hasher.verify(user.password, created: fetchedUser.password) {
                             /// 先删除再创建token
-                            return try TokenToken.query(on: req)
+                            return try TokenAuthToken.query(on: req)
                                 .filter(\.userId == fetchedUser.requireID())
                                 .delete()
                                 .flatMap { _ in
                                     let token = try URandom().generateData(count: 32).base64EncodedString()
-                                    return try TokenToken(token: token, userId: fetchedUser.requireID())
+                                    return try TokenAuthToken(token: token, userId: fetchedUser.requireID())
                                         .save(on: req)
                             }
                             
@@ -76,13 +76,13 @@ private extension TokenAuthController {
     }
     
     func profile(_ req: Request) throws -> String {
-        let user = try req.requireAuthenticated(TokenUser.self)
+        let user = try req.requireAuthenticated(TokenAuthUser.self)
         return "Welcome \(user.email)"
     }
     
     func logout(_ req: Request) throws -> Future<HTTPResponse> {
-        let user = try req.requireAuthenticated(TokenUser.self)
-        return try TokenToken.query(on: req)
+        let user = try req.requireAuthenticated(TokenAuthUser.self)
+        return try TokenAuthToken.query(on: req)
             .filter(\.userId == user.requireID())
             .delete()
             .transform(to: HTTPResponse(status: .ok))
@@ -116,7 +116,7 @@ extension TokenAuthController {
     }
 }
 
-final class TokenUser: SQLiteModel {
+final class TokenAuthUser: SQLiteModel {
     var id: Int?
     var email: String
     var password: String
@@ -128,26 +128,26 @@ final class TokenUser: SQLiteModel {
     }
 }
 
-extension TokenUser {
+extension TokenAuthUser {
     struct Public: Content {
         let id: Int
         let email: String
     }
 }
 
-extension TokenUser: TokenAuthenticatable {
-    typealias TokenType = TokenToken
+extension TokenAuthUser: TokenAuthenticatable {
+    typealias TokenType = TokenAuthToken
 }
 
-extension TokenUser: Content {}
-extension TokenUser: Parameter {}
-extension TokenUser: Migration {}
+extension TokenAuthUser: Content {}
+extension TokenAuthUser: Parameter {}
+extension TokenAuthUser: Migration {}
 
-// MARK: - TokenToken
-final class TokenToken: SQLiteModel {
+// MARK: - TokenAuthToken
+final class TokenAuthToken: SQLiteModel {
     var id: Int?
     var token: String
-    var userId: TokenUser.ID
+    var userId: TokenAuthUser.ID
     
     init(token: String, userId: User.ID) {
         self.token = token
@@ -155,23 +155,23 @@ final class TokenToken: SQLiteModel {
     }
 }
 
-extension TokenToken {
-    var user: Parent<TokenToken, TokenUser> {
+extension TokenAuthToken {
+    var user: Parent<TokenAuthToken, TokenAuthUser> {
         return parent(\.userId)
     }
 }
 
-extension TokenToken: BearerAuthenticatable {
-    static var tokenKey: WritableKeyPath<TokenToken, String> = \.token
+extension TokenAuthToken: BearerAuthenticatable {
+    static var tokenKey: WritableKeyPath<TokenAuthToken, String> = \.token
 }
 
-extension TokenToken: Authentication.Token {
-    typealias UserType = TokenUser
-    typealias UserIDType = TokenToken.ID
+extension TokenAuthToken: Authentication.Token {
+    typealias UserType = TokenAuthUser
+    typealias UserIDType = TokenAuthToken.ID
     
-    static var userIDKey: WritableKeyPath<TokenToken, TokenToken.ID> = \.userId
+    static var userIDKey: WritableKeyPath<TokenAuthToken, TokenAuthToken.ID> = \.userId
 }
 
-extension TokenToken: Content {}
-extension TokenToken: Migration {}
-extension TokenToken: Parameter {}
+extension TokenAuthToken: Content {}
+extension TokenAuthToken: Migration {}
+extension TokenAuthToken: Parameter {}
