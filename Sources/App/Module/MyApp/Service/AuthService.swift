@@ -9,38 +9,25 @@ import Foundation
 import FluentMySQL
 import Crypto
 
-extension AuthService {
-    struct Public: Content {
-        let accessToken: AccessToken.Token
-        let expiresIn: TimeInterval
-        let refreshToken: RefreshToken.Token
-        
-        init(accessToken: AccessToken, refreshToken: RefreshToken) {
-            self.accessToken = accessToken.token
-            self.expiresIn = accessToken.expiryTime.timeIntervalSince1970 //Not honored, just an estimate
-            self.refreshToken = refreshToken.token
-        }
-    }
-}
 
 final class AuthService {
-    func authentication(for refreshToken: RefreshToken.Token, on req: Request) throws -> Future<Response> {
+    func token(for refreshToken: RefreshToken.Token, on req: Request) throws -> Future<Response> {
         return try user(matching: refreshToken, on: req)
             .unwrap(or: Api.Code.userNotExist.error)
             .flatMap { user in
-                try self.authentication(for: user.requireID(), on: req)
+                try self.token(for: user.requireID(), on: req)
         }
     }
     
-    func authentication(for userId: User.ID, on req: Request)
+    func token(for userId: User.ID, on req: Request)
         throws -> Future<Response> {
             return try removeAllTokens(for: userId, on: req).flatMap { _ in
                 try map(
-                    to: Public.self,
+                    to: Token.self,
                     self.accessToken(for: userId, on: req),
                     self.refreshToken(for: userId, on: req)
                 ) { access, refresh in
-                    return Public(accessToken: access, refreshToken: refresh)
+                    return Token(accessToken: access, refreshToken: refresh)
                     }
                     .toJson(on: req)
             }

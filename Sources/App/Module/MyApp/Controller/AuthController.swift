@@ -23,16 +23,16 @@ final class AuthController: RouteCollection {
         let basicAuthMiddleware = UserAuth.basicAuthMiddleware(using: BCrypt)
         let guardAuthMiddleware = User.guardAuthMiddleware()
         let basiceAuthGroup = group.grouped([basicAuthMiddleware, guardAuthMiddleware])
-        basiceAuthGroup.post(User.Public.self, at: Api.Path.revoke, use: accessTokenRevokeHandler)
+        basiceAuthGroup.post(User.Email.self, at: Api.Path.revoke, use: accessTokenRevokeHandler)
 	}
 }
 
 private extension AuthController {
 	func refreshAccessTokenHandler(req: Request, token: RefreshToken.Public) throws -> Future<Response> {
-		return try authService.authentication(for: token.refreshToken, on: req)
+		return try authService.token(for: token.refreshToken, on: req)
 	}
 	
-    func accessTokenRevokeHandler(req: Request, user: User.Public) throws -> Future<HTTPResponseStatus> {
+    func accessTokenRevokeHandler(req: Request, user: User.Email) throws -> Future<HTTPResponseStatus> {
         return try authService.revokeTokens(forEmail: user.email, on: req)
         .transform(to: .noContent)
     }

@@ -9,18 +9,6 @@ import Foundation
 import FluentMySQL
 import Crypto
 
-extension RefreshToken: PublicType {
-    typealias Token = String
-    
-    struct Public: Content {
-        let refreshToken: Token
-    }
-    
-    var `public`: Public {
-        return Public(refreshToken: token)
-    }
-}
-
 struct RefreshToken: MySQLModel {
     var id : Int?
     let token: Token
@@ -42,3 +30,16 @@ struct RefreshToken: MySQLModel {
 
 extension RefreshToken: Content {}
 extension RefreshToken: Migration {}
+
+
+extension RefreshToken: PublicType {
+    typealias Token = String
+    
+    struct Public: Content {
+        let refreshToken: Token
+    }
+    
+    var `public`: Public {
+        return Public(refreshToken: token)
+    }
+}

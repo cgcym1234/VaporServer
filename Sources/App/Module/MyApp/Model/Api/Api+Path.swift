@@ -15,6 +15,10 @@ extension Api {
         case revoke
         case login
         case register
+        case newPassword
+        case changePasswordCode
+        case activateCode
+        case oauthToken = "oauth/token"
         case users
         case todos
         case search

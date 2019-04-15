@@ -12,7 +12,12 @@ import Authentication
 
 
 extension UserAuth {
-    enum AuthType: String {
+    /// https://github.com/vapor/fluent-postgresql/issues/21
+    enum AuthType: String, Content, MySQLEnumType {
+        static func reflectDecoded() throws -> (UserAuth.AuthType, UserAuth.AuthType) {
+            return (.email, .wxapp)
+        }
+        
         case email = "email"
         case wxapp = "wxapp" // 微信小程序
         
@@ -26,7 +31,7 @@ extension UserAuth {
 struct UserAuth: MySQLModel {
     var id: Int?
     var userId: User.ID
-    var identityType: String // 登录类型
+    var identityType: AuthType // 登录类型
     var identifier: String // 标志 (手机号，邮箱，用户名或第三方应用的唯一标识)
     var credential: String // 密码凭证(站内的保存密码， 站外的不保存或保存 token)
     
@@ -40,7 +45,7 @@ struct UserAuth: MySQLModel {
     
     init(userId: User.ID?, identityType: AuthType, identifier: String, credential: String) {
         self.userId = userId ?? 0
-        self.identityType = identityType.rawValue
+        self.identityType = identityType
         self.identifier = identifier
         self.credential = credential
     }

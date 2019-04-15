@@ -94,12 +94,14 @@ private func setupMigration(_ services: inout Services) throws {
     migrations.add(model: TokenAuthToken.self, database: .sqlite)
     migrations.add(model: Pokemon.self, database: .sqlite)
     
+    migrations.add(model: Todo.self, database: .sqlite)
+    
+    migrations.add(model: Organization.self, database: .mysql)
     migrations.add(model: User.self, database: .mysql)
-    migrations.add(model: UserAuth.self, database: .mysql)
     migrations.add(model: RefreshToken.self, database: .mysql)
     migrations.add(model: AccessToken.self, database: .mysql)
-    migrations.add(model: Token.self, database: .sqlite)
-    migrations.add(model: Todo.self, database: .sqlite)
+    migrations.add(model: ActiveCode.self, database: .mysql)
+    migrations.add(model: UserAuth.self, database: .mysql)
     
     migrations.add(model: Forum.self, database: .mysql)
     migrations.add(model: Message.self, database: .mysql)

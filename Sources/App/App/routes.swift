@@ -5,7 +5,7 @@ import Authentication
 public func routes(_ router: Router) throws {
     /// 2种注册方式，一样的
     try BoxueController().boot(router: router)
-    try router.register(collection: BoxueController())
+//    try router.register(collection: BoxueController())
     
     try router.register(collection: WebAuthController())
     try router.register(collection: BasicAuthController())

@@ -25,17 +25,17 @@ struct Forum: Content, MySQLModel {
 }
 
 extension Forum: Migration {
-    //    //默认实现
-    //    static func prepare(on connection: MySQLConnection) -> Future<Void> {
-    //        return Database.create(Forum.self, on: connection) {
-    //            builder in
-    //            try addProperties(to: builder)
-    //        }
-    //    }
-    //
-    //    static func revert(on connection: MySQLConnection) -> Future<Void> {
-    //        return Database.delete(Forum.self, on: connection)
-    //    }
+//        //默认实现
+//        static func prepare(on connection: MySQLConnection) -> Future<Void> {
+//            return Database.create(Forum.self, on: connection) {
+//                builder in
+//                try addProperties(to: builder)
+//            }
+//        }
+//
+//        static func revert(on connection: MySQLConnection) -> Future<Void> {
+//            return Database.delete(Forum.self, on: connection)
+//        }
 }
 
 extension Forum {

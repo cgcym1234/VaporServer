@@ -11,9 +11,18 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent-mysql.git", from: "3.0.0"),
         .package(url: "https://github.com/vapor/auth.git", from: "2.0.0"),
         .package(url: "https://github.com/vapor/crypto.git", from: "3.0.0"),
+        .package(url: "https://github.com/IBM-Swift/Swift-SMTP", from: "5.0.0"),
     ],
     targets: [
-        .target(name: "App", dependencies: ["Vapor", "Leaf", "FluentSQLite", "Authentication", "Crypto", "FluentMySQL"]),
+        .target(name: "App", dependencies: [
+            "Vapor",
+            "Leaf",
+            "FluentSQLite",
+            "FluentMySQL",
+            "Authentication",
+            "Crypto",
+            "SwiftSMTP"
+            ]),
         .target(name: "Run", dependencies: ["App"]),
         .testTarget(name: "AppTests", dependencies: ["App"])
     ]
