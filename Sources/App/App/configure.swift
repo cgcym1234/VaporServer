@@ -112,6 +112,10 @@ private func setupMigration(_ services: inout Services) throws {
     migrations.add(migration: Message.Seeder.self, database: .mysql)
     
     services.register(migrations)
+    
+    /// 默认localhost 局域网无法访问
+    let serverConfiure = NIOServerConfig.default(hostname: "0.0.0.0", port: 8080)
+    services.register(serverConfiure)
 }
 
 private func setupCommand(_ services: inout Services) throws {

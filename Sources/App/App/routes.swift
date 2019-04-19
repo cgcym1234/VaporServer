@@ -15,10 +15,10 @@ public func routes(_ router: Router) throws {
     try router.register(collection: OneToManyControlelr())
     
     /// my demo
-    let api = router.grouped(Api.Path.api)
+    let api = router.grouped(Api.Path.group)
     try api.register(collection: AuthController())
+    try api.register(collection: UserController())
     
-    try UserController().boot(router: api)
     try TodoController().boot(router: api)
 }
 

@@ -69,7 +69,7 @@ private extension UserController {
             .filter(\.identityType == .email)
             .filter(\.identifier == user.email)
             .first()
-            .unwrap(or: Api.Code.modelNotExist.error)
+            .unwrap(or: Api.Code.userNotExist.error)
             .flatMap { authUser in
                 let digest = try req.make(BCryptDigest.self)
                 guard try digest.verify(user.password, created: authUser.credential) else {

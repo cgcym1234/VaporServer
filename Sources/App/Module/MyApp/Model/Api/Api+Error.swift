@@ -8,20 +8,26 @@
 import Foundation
 
 extension Api {
-    struct Error: Debuggable, Content {
-        var identifier: String
-        var reason: String
+    struct Error: Content {
+        var message: String
         var code: Code
         
         init(code: Code, message: String? = nil) {
-            self.identifier = "api error: \(code.rawValue)"
-            self.reason = message ?? code.desc
+            self.message = message ?? code.desc
             self.code = code
         }
     }
 }
 
 extension Api.Error: AbortError {
+    var identifier: String {
+        return message
+    }
+    
+    var reason: String {
+        return message
+    }
+    
     var status: HTTPResponseStatus {
         return .ok
     }

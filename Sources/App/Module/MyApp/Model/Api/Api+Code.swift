@@ -14,7 +14,7 @@ extension Api.Code {
 }
 
 extension Api {
-    enum Code: UInt, Content {
+    enum Code: Int, Content {
         case ok = 0  // 请求成功状态
         
         /// 接口失败

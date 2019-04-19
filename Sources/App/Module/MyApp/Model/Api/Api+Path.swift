@@ -9,27 +9,27 @@ import Foundation
 
 extension Api {
     enum Path: String, PathComponentsRepresentable {
-        case api
-        case token
-        case refresh
-        case revoke
+        case group = "api"
+        
+        case users
         case login
         case register
         case newPassword
         case changePasswordCode
         case activateCode
         case oauthToken = "oauth/token"
-        case users
-        case todos
-        case search
+        
+        case token
+        case refresh
+        case revoke
         
         
         var relativeValue: String {
             switch self {
-            case .api:
+            case .group:
                 return rawValue
             default:
-                return "\(Path.api.rawValue)/\(rawValue)"
+                return "\(type(of: self).group.rawValue)/\(rawValue)"
             }
         }
         
