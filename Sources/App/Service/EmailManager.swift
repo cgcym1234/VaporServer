@@ -16,7 +16,7 @@ extension EmailManager {
         let from = Mail.User(name: "yy", email: myEmail)
         let mail = Mail(from: from, to: [emailTo], subject: subject, text: text)
         
-        let smtp = SMTP(hostname: "smtp.163.com", email: myEmail, password: "laozihs5dQQ163", port: 465, tlsMode: .requireTLS, domainName: "book.twicebook.top")
+        let smtp = SMTP(hostname: "smtp.163.com", email: myEmail, password: "laozihs5dQQw", port: 465, tlsMode: .requireTLS, domainName: "book.twicebook.top")
         DispatchQueue.global().async {
             smtp.send(mail)
             promise.succeed()

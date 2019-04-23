@@ -17,13 +17,13 @@ final class AuthController: RouteCollection {
     private let authService = AuthService()
     
 	func boot(router: Router) throws {
-        let group = router.grouped(Api.Path.token)
-        group.post(RefreshToken.Public.self, at: Api.Path.refresh, use: refreshAccessTokenHandler)
+        let group = router.grouped(Api.Path.Token.group)
+        group.post(RefreshToken.Public.self, at: Api.Path.Token.refresh, use: refreshAccessTokenHandler)
         
-        let basicAuthMiddleware = UserAuth.basicAuthMiddleware(using: BCrypt)
+        let basicAuthMiddleware = UserAuth.basicAuthMiddleware(using: BCryptDigest())
         let guardAuthMiddleware = User.guardAuthMiddleware()
         let basiceAuthGroup = group.grouped([basicAuthMiddleware, guardAuthMiddleware])
-        basiceAuthGroup.post(User.Email.self, at: Api.Path.revoke, use: accessTokenRevokeHandler)
+        basiceAuthGroup.post(User.Email.self, at: Api.Path.Token.revoke, use: accessTokenRevokeHandler)
 	}
 }
 

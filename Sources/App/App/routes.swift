@@ -18,6 +18,7 @@ public func routes(_ router: Router) throws {
     let api = router.grouped(Api.Path.group)
     try api.register(collection: AuthController())
     try api.register(collection: UserController())
+    try api.register(collection: AccountController())
     
     try TodoController().boot(router: api)
 }

@@ -39,3 +39,36 @@ extension Organization {
 extension Organization: Content {}
 extension Organization: Migration {}
 
+extension Organization {
+    struct Forms: Migration {
+        typealias Database = MySQLDatabase
+        
+        static let organizations = [
+            "再书"
+        ]
+        
+        static func prepare(on conn: MySQLConnection) -> EventLoopFuture<Void> {
+            return organizations
+                .map { Organization(parentId: 0, name: $0, remarks: $0) }
+                .map { $0.create(on: conn) }
+                .flatten(on: conn)
+                .transform(to: ())
+        }
+        
+        static func revert(on conn: MySQLConnection) -> EventLoopFuture<Void> {
+            return organizations
+                .map {
+                    Organization.query(on: conn)
+                        .filter(\.name == $0).delete()
+                }
+                .flatten(on: conn)
+                .transform(to: ())
+            //            let futures = organizations.map {
+            //                Organization.query(on: conn)
+            //                    .filter(\.name == $0).delete()
+            //            }.flatten(on: conn).transform(to: ())
+            //
+            //            return Future<Void>.andAll(futures, eventLoop: conn.eventLoop)
+        }
+    }
+}

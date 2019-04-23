@@ -60,7 +60,7 @@ extension User: Migration {
         return Database.create(self, on: conn) { builder in
             try addProperties(to: builder)
 //            builder.unique(on: \.email)
-            builder.reference(from: \.organizId, to: \Organization.id)
+//            builder.reference(from: \.organizId, to: \Organization.id)
         }
     }
 }

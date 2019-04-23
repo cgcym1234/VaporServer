@@ -52,7 +52,7 @@ extension Api {
             case .modelExisted:
                 return "对象已存在"
             case .authFail:
-                return "认证失败"
+                return "密码错误"
             case .codeFail:
                 return "验证码错误"
             case .resonNotExist:

@@ -11,25 +11,72 @@ extension Api {
     enum Path: String, PathComponentsRepresentable {
         case group = "api"
         
-        case users
-        case login
-        case register
-        case newPassword
-        case changePasswordCode
-        case activateCode
-        case oauthToken = "oauth/token"
+        enum Users: String, PathComponentsRepresentable {
+            case group = "users"
+            case login
+            case register
+            case info
+            case newPassword
+            case changePasswordCode
+            case activateCode
+            case oauthToken = "oauth/token"
+            
+            var relativeValue: String {
+                switch self {
+                case .group:
+                    return Path.group.relativeValue + "/" + rawValue
+                default:
+                    return type(of: self).group.relativeValue + "/" + rawValue
+                }
+            }
+            
+            func convertToPathComponents() -> [PathComponent] {
+                return [.init(stringLiteral: rawValue)]
+            }
+        }
         
-        case token
-        case refresh
-        case revoke
+        enum Token: String, PathComponentsRepresentable {
+            case group = "token"
+            case refresh
+            case revoke
+            
+            var relativeValue: String {
+                switch self {
+                case .group:
+                    return Path.group.relativeValue + "/" + rawValue
+                default:
+                    return type(of: self).group.relativeValue + "/" + rawValue
+                }
+            }
+            
+            func convertToPathComponents() -> [PathComponent] {
+                return [.init(stringLiteral: rawValue)]
+            }
+        }
         
+        enum Account: String, PathComponentsRepresentable {
+            case group = "account"
+            case info
+            case update
+            
+            var relativeValue: String {
+                switch self {
+                case .group:
+                    return Path.group.relativeValue + "/" + rawValue
+                default:
+                    return type(of: self).group.relativeValue + "/" + rawValue
+                }
+            }
+            
+            func convertToPathComponents() -> [PathComponent] {
+                return [.init(stringLiteral: rawValue)]
+            }
+        }
         
         var relativeValue: String {
             switch self {
             case .group:
                 return rawValue
-            default:
-                return "\(type(of: self).group.rawValue)/\(rawValue)"
             }
         }
         
@@ -41,5 +88,5 @@ extension Api {
             return [.init(stringLiteral: rawValue)]
         }
     }
-    
 }
+

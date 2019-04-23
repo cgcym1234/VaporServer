@@ -8,6 +8,8 @@ import Leaf
 public func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
     try setupRouter(&services)
     
+    try setupContent(&services)
+    
     try setupLeaf(&config, &services)
     
     try setupDatabase(&env, &services)
@@ -18,7 +20,21 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     
     try setupAuth(&services)
     
-//    try setupConfig(&services)
+    try setupConfig(&services)
+}
+
+private func setupContent(_ services: inout Services) throws {
+    let encoder = JSONEncoder.snakeCase
+    let decoder = JSONDecoder.snakeCase
+    
+    encoder.dateEncodingStrategy = .millisecondsSince1970
+    decoder.dateDecodingStrategy = .millisecondsSince1970
+    
+    var contentConfig = ContentConfig.default()
+    contentConfig.use(encoder: encoder, for: .json)
+    contentConfig.use(decoder: decoder, for: .json)
+    
+    services.register(contentConfig)
 }
 
 private func setupRouter(_ services: inout Services) throws {
@@ -108,14 +124,11 @@ private func setupMigration(_ services: inout Services) throws {
     
     Forum.defaultDatabase = .mysql
     
+    /// 数据填充
     migrations.add(migration: Forum.Seeder.self, database: .mysql)
     migrations.add(migration: Message.Seeder.self, database: .mysql)
     
     services.register(migrations)
-    
-    /// 默认localhost 局域网无法访问
-    let serverConfiure = NIOServerConfig.default(hostname: "0.0.0.0", port: 8080)
-    services.register(serverConfiure)
 }
 
 private func setupCommand(_ services: inout Services) throws {
@@ -142,9 +155,9 @@ private func setupAuth(_ services: inout Services) throws {
 }
 
 private func setupConfig(_ services: inout Services) throws {
-    /// 更改项目的端口
-    let myService = NIOServerConfig.default(port: 8001)
-    services.register(myService)
+    /// 默认localhost 局域网无法访问
+    let serverConfiure = NIOServerConfig.default(hostname: "0.0.0.0", port: 8080)
+    services.register(serverConfiure)
 }
 
 

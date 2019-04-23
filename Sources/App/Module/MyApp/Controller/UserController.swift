@@ -14,36 +14,36 @@ final class UserController: RouteCollection {
     private let authService = AuthService()
     
     func boot(router: Router) throws {
-        let group = router.grouped(Api.Path.users)
+        let group = router.grouped(Api.Path.Users.group)
         
-        group.post(User.Register.self, at: Api.Path.register, use: register)
-        group.post(User.EmailLogin.self, at: Api.Path.login, use: login)
-        group.post(User.NewPassword.self, at: Api.Path.newPassword, use: newPassword)
+        group.post(User.Register.self, at: Api.Path.Users.register, use: register)
+        group.post(User.EmailLogin.self, at: Api.Path.Users.login, use: login)
+        group.post(User.NewPassword.self, at: Api.Path.Users.newPassword, use: newPassword)
         
         /// 发送修改密码验证码
-        group.post(User.Email.self, at: Api.Path.changePasswordCode, use: changePasswordCode)
+        group.post(User.Email.self, at: Api.Path.Users.changePasswordCode, use: changePasswordCode)
         
         /// 激活校验码
-        group.get(Api.Path.activateCode, use: activeRegisterEmailCode)
+        group.get(Api.Path.Users.activateCode, use: activeRegisterEmailCode)
         
         /// 微信小程序
         /// /oauth/token 通过小程序提供的验证信息获取服务器自己的 token
-        group.post(User.WXAppOAuth.self, at: Api.Path.oauthToken, use: wxappOAuthToken)
+        group.post(User.WXAppOAuth.self, at: Api.Path.Users.oauthToken, use: wxappOAuthToken)
     }
 }
 
 // MARK: - Handlers
 private extension UserController {
     func register(_ req: Request, user: User.Register) throws -> Future<Response> {
-        return UserAuth.query(on: req)
+        return UserAuth
+            .query(on: req)
             .filter(\.identityType == .email)
             .filter(\.identifier == user.email)
             .first()
             .flatMap {
                 if $0 != nil {
-                    throw Api.Code.modelExisted.error
+                    throw Api.Code.userExist.error
                 }
-                
                 var userAuth = UserAuth(userId: nil, identityType: .email, identifier: user.email, credential: user.password)
                 try userAuth.validate()
                 let newUser = User(name: user.name, email: user.email, organizId: user.organizId)

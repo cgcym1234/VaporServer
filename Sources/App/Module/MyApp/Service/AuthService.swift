@@ -21,15 +21,16 @@ final class AuthService {
     
     func token(for userId: User.ID, on req: Request)
         throws -> Future<Response> {
-            return try removeAllTokens(for: userId, on: req).flatMap { _ in
-                try map(
-                    to: Token.self,
-                    self.accessToken(for: userId, on: req),
-                    self.refreshToken(for: userId, on: req)
-                ) { access, refresh in
-                    return Token(accessToken: access, refreshToken: refresh)
-                    }
-                    .toJson(on: req)
+            return try removeAllTokens(for: userId, on: req)
+                .flatMap { _ in
+                    try map(
+                        to: Token.self,
+                        self.accessToken(for: userId, on: req),
+                        self.refreshToken(for: userId, on: req)
+                    ) { access, refresh in
+                        return Token(accessToken: access, refreshToken: refresh)
+                        }
+                        .toJson(on: req)
             }
     }
     
@@ -98,11 +99,13 @@ private extension AuthService {
                 throw Api.Code.userNotExist.error
             }
             
-            let accessTokens = AccessToken.query(on: conn)
+            let accessTokens = AccessToken
+                .query(on: conn)
                 .filter(\.userId == userId)
                 .delete()
             
-            let refreshTokens = RefreshToken.query(on: conn)
+            let refreshTokens = RefreshToken
+                .query(on: conn)
                 .filter(\.userId == userId)
                 .delete()
             
