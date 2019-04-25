@@ -16,7 +16,7 @@ final class AuthController: RouteCollection {
     
     private let authService = AuthService()
     
-	func boot(router: Router) throws {
+    func boot(router: Router) throws {
         let group = router.grouped(Api.Path.Token.group)
         group.post(RefreshToken.Public.self, at: Api.Path.Token.refresh, use: refreshAccessTokenHandler)
         
@@ -24,16 +24,17 @@ final class AuthController: RouteCollection {
         let guardAuthMiddleware = User.guardAuthMiddleware()
         let basiceAuthGroup = group.grouped([basicAuthMiddleware, guardAuthMiddleware])
         basiceAuthGroup.post(User.Email.self, at: Api.Path.Token.revoke, use: accessTokenRevokeHandler)
-	}
+    }
 }
 
 private extension AuthController {
-	func refreshAccessTokenHandler(req: Request, token: RefreshToken.Public) throws -> Future<Response> {
-		return try authService.token(for: token.refreshToken, on: req)
-	}
-	
-    func accessTokenRevokeHandler(req: Request, user: User.Email) throws -> Future<HTTPResponseStatus> {
-        return try authService.revokeTokens(forEmail: user.email, on: req)
-        .transform(to: .noContent)
+    func refreshAccessTokenHandler(req: Request, content: RefreshToken.Public) throws -> Future<Response> {
+        return try authService.token(for: content.refreshToken, on: req)
+    }
+    
+    func accessTokenRevokeHandler(req: Request, content: User.Email) throws -> Future<HTTPResponseStatus> {
+        return try authService
+            .revokeTokens(forEmail: content.email, on: req)
+            .transform(to: .noContent)
     }
 }

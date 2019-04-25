@@ -120,6 +120,14 @@ extension User {
         let newPassword: String
         let code: String
     }
+    
+    struct Update: Content {
+        var organizId: Organization.ID?
+        var phone: String?
+        var name: String?
+        var avator: String?
+        var info: String?
+    }
 }
 
 extension User {

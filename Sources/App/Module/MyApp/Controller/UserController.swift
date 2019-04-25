@@ -34,19 +34,19 @@ final class UserController: RouteCollection {
 
 // MARK: - Handlers
 private extension UserController {
-    func register(_ req: Request, user: User.Register) throws -> Future<Response> {
+    func register(_ req: Request, content: User.Register) throws -> Future<Response> {
         return UserAuth
             .query(on: req)
             .filter(\.identityType == .email)
-            .filter(\.identifier == user.email)
+            .filter(\.identifier == content.email)
             .first()
             .flatMap {
                 if $0 != nil {
                     throw Api.Code.userExist.error
                 }
-                var userAuth = UserAuth(userId: nil, identityType: .email, identifier: user.email, credential: user.password)
+                var userAuth = UserAuth(userId: nil, identityType: .email, identifier: content.email, credential: content.password)
                 try userAuth.validate()
-                let newUser = User(name: user.name, email: user.email, organizId: user.organizId)
+                let newUser = User(name: content.name, email: content.email, organizId: content.organizId)
                 
                 return newUser.create(on: req)
                     .flatMap { user in
@@ -64,15 +64,15 @@ private extension UserController {
         }
     }
     
-    func login(_ req: Request, user: User.EmailLogin) throws -> Future<Response> {
+    func login(_ req: Request, content: User.EmailLogin) throws -> Future<Response> {
         return UserAuth.query(on: req)
             .filter(\.identityType == .email)
-            .filter(\.identifier == user.email)
+            .filter(\.identifier == content.email)
             .first()
             .unwrap(or: Api.Code.userNotExist.error)
             .flatMap { authUser in
                 let digest = try req.make(BCryptDigest.self)
-                guard try digest.verify(user.password, created: authUser.credential) else {
+                guard try digest.verify(content.password, created: authUser.credential) else {
                     throw Api.Code.authFail.error
                 }
                 
@@ -80,10 +80,10 @@ private extension UserController {
         }
     }
     
-    func newPassword(_ req: Request, model: User.NewPassword) throws -> Future<Response> {
+    func newPassword(_ req: Request, content: User.NewPassword) throws -> Future<Response> {
         return UserAuth.query(on: req)
             .filter(\.identityType == .email)
-            .filter(\.identifier == model.email)
+            .filter(\.identifier == content.email)
             .first()
             .unwrap(or: Api.Code.modelNotExist.error)
             .flatMap { userAuth in
@@ -95,7 +95,7 @@ private extension UserController {
                         return try user.codes
                             .query(on: req)
                             .filter(\ActiveCode.codeType == ActiveCode.CodeType.changePassword.rawValue)
-                            .filter(\ActiveCode.code == model.code)
+                            .filter(\ActiveCode.code == content.code)
                             .first()
                             .flatMap { code in
                                 // 只有激活的用户才可以修改密码
@@ -104,7 +104,7 @@ private extension UserController {
                                 }
                                 
                                 var tmpUserAuth = userAuth
-                                tmpUserAuth.credential = model.password
+                                tmpUserAuth.credential = content.password
                                 
                                 return try tmpUserAuth.auth(with: req.make(BCryptDigest.self))
                                     .save(on: req)
@@ -116,10 +116,10 @@ private extension UserController {
     }
     
     /// 发送修改密码的验证码
-    func changePasswordCode(_ req: Request, model: User.Email) throws -> Future<Response> {
+    func changePasswordCode(_ req: Request, content: User.Email) throws -> Future<Response> {
         return UserAuth.query(on: req)
             .filter(\.identityType == .email)
-            .filter(\.identifier == model.email)
+            .filter(\.identifier == content.email)
             .first()
             .unwrap(or: Api.Code.modelNotExist.error)
             .flatMap { auth in
@@ -128,7 +128,7 @@ private extension UserController {
                 
                 return try activeCode.create(on: req)
                     .flatMap { code in
-                        try EmailManager.changePassword(email: model.email, code: codeStr).send(on: req)
+                        try EmailManager.changePassword(email: content.email, code: codeStr).send(on: req)
                     }.toJson(on: req)
         }
     }
@@ -152,10 +152,10 @@ private extension UserController {
         }
     }
     
-    func wxappOAuthToken(_ req: Request, model: User.WXAppOAuth) throws -> Future<Response> {
+    func wxappOAuthToken(_ req: Request, content: User.WXAppOAuth) throws -> Future<Response> {
         let appId = "wx295f34d030798e48"
         let secret = "39a549d066a34c56c8f1d34d606e3a95"
-        let url = "https://api.weixin.qq.com/sns/jscode2session?appid=\(appId)&secret=\(secret)&js_code=\(model.code)&grant_type=authorization_code"
+        let url = "https://api.weixin.qq.com/sns/jscode2session?appid=\(appId)&secret=\(secret)&js_code=\(content.code)&grant_type=authorization_code"
         return try req.make(Client.self)
         .get(url)
             .flatMap { res in
@@ -167,8 +167,8 @@ private extension UserController {
                 
                 guard
                     let sessionKey = wxRes.sessionKey.base64DecodedData(),
-                let encryptedData = model.encryptedData.base64DecodedData(),
-                    let iv = model.iv.base64DecodedData() else {
+                let encryptedData = content.encryptedData.base64DecodedData(),
+                    let iv = content.iv.base64DecodedData() else {
                         throw Api.Code.base64DecodeError.error
                 }
                 
