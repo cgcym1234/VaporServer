@@ -52,7 +52,7 @@ extension Request {
         return try Api.emptyResponse.encode(for: self)
     }
     
-    func toJson<T: Content>(_ content: T) throws -> Future<Response> {
+    func toJson<T: Content>(with content: T) throws -> Future<Response> {
         return try Api.Response(data: content).encode(for: self)
     }
 }

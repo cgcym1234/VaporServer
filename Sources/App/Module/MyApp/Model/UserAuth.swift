@@ -66,11 +66,11 @@ extension UserAuth: BasicAuthenticatable {
 }
 
 extension UserAuth: Validatable {
-    /// 只针对 email 的校验
+    /// 针对 email和password的校验
     static func validations() throws -> Validations<UserAuth> {
         var validations = Validations(UserAuth.self)
         try validations.add(\.identifier, .email)
-//        try validations.add(\.credential, .password)
+        try validations.add(\.credential, .password)
         
         return validations
     }

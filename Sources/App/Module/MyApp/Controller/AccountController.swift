@@ -21,7 +21,7 @@ final class AccountController: RouteCollection {
 private extension AccountController {
     func userInfo(_ req: Request) throws -> Future<Response> {
         let user = try req.requireAuthenticated(User.self)
-        return try req.toJson(user)
+        return try req.toJson(with: user)
     }
     
     func updateUser(_ req: Request, content: User.Update) throws -> Future<Response> {

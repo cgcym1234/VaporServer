@@ -139,9 +139,10 @@ private func setupCommand(_ services: inout Services) throws {
 }
 
 private func setupMiddleware(_ config: inout Config, _ services: inout Services) throws {
+    services.register(MyFileMiddleware.self)
     /// Register middleware
     var middlewares = MiddlewareConfig.default() // Create _empty_ middleware config
-    middlewares.use(FileMiddleware.self) // Serves files from `Public/` directory
+    middlewares.use(MyFileMiddleware.self) // Serves files from `Public/` directory
     middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
     middlewares.use(SessionsMiddleware.self)
     services.register(middlewares)

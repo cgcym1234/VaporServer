@@ -38,6 +38,15 @@
         }
       },
       {
+        "package": "cmark",
+        "repositoryURL": "https://github.com/brokenhandsio/cmark-gfm.git",
+        "state": {
+          "branch": null,
+          "revision": "351e5cb1bc6a43567b8ff9b9b3f7357c58bdda83",
+          "version": "1.0.1"
+        }
+      },
+      {
         "package": "Console",
         "repositoryURL": "https://github.com/vapor/console.git",
         "state": {
@@ -51,8 +60,8 @@
         "repositoryURL": "https://github.com/vapor/core.git",
         "state": {
           "branch": null,
-          "revision": "57368d4092f92df3131e5968c8ed24a3c7361ec0",
-          "version": "3.8.1"
+          "revision": "2731f8ba0cf274a61c9bd6ab43550f692ffaf879",
+          "version": "3.9.0"
         }
       },
       {
@@ -60,8 +69,8 @@
         "repositoryURL": "https://github.com/vapor/crypto.git",
         "state": {
           "branch": null,
-          "revision": "45bb12d13cdec80dbd1cc0685ea002e51ab83439",
-          "version": "3.3.2"
+          "revision": "df8eb7d8ae51787b3a0628aa3975e67666da936c",
+          "version": "3.3.3"
         }
       },
       {
@@ -125,6 +134,15 @@
           "branch": null,
           "revision": "e29073bb7cecf3673e56bcb16180e8fd0cb091f6",
           "version": "1.8.1"
+        }
+      },
+      {
+        "package": "SwiftMarkdown",
+        "repositoryURL": "https://github.com/vapor-community/markdown.git",
+        "state": {
+          "branch": null,
+          "revision": "aea4876786fa284f6d86af1ce3436a17e22035b5",
+          "version": "0.4.0"
         }
       },
       {
@@ -222,8 +240,8 @@
         "repositoryURL": "https://github.com/IBM-Swift/Swift-SMTP",
         "state": {
           "branch": null,
-          "revision": "496f779a073991609cf3745214e49449d9b5db24",
-          "version": "5.1.0"
+          "revision": "23360cff5fcb92fb37041f5dd1ef16d7b8fe5ff0",
+          "version": "5.1.1"
         }
       },
       {

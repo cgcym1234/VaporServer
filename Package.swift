@@ -12,6 +12,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/auth.git", from: "2.0.0"),
         .package(url: "https://github.com/vapor/crypto.git", from: "3.0.0"),
         .package(url: "https://github.com/IBM-Swift/Swift-SMTP", from: "5.0.0"),
+        .package(url: "https://github.com/vapor-community/markdown.git", from: "0.4.0"),
     ],
     targets: [
         .target(name: "App", dependencies: [
@@ -21,7 +22,8 @@ let package = Package(
             "FluentMySQL",
             "Authentication",
             "Crypto",
-            "SwiftSMTP"
+            "SwiftSMTP",
+            "SwiftMarkdown"
             ]),
         .target(name: "Run", dependencies: ["App"]),
         .testTarget(name: "AppTests", dependencies: ["App"])
