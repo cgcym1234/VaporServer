@@ -13,7 +13,6 @@ final class BlogController: RouteCollection {
     
     func boot(router: Router) throws {
         router.get(Api.Path.Blog.group, use: publicBlogs)
-        router.get(Api.Path.Blog.group, String.parameter, use: otherBlogs)
     }
 }
 
@@ -37,16 +36,11 @@ private extension BlogController {
             publicPath = try req.make(DirectoryConfig.self).workDir + "Public/Blogs/"
         }
         
-        return try req.toJson(with: blogs(in: publicPath))
-    }
-    
-    func otherBlogs(_ req: Request) throws -> Future<Response> {
-        if publicPath == nil {
-            publicPath = try req.make(DirectoryConfig.self).workDir + "Public/Blogs/"
+        var path = publicPath!
+        if let subPath = try? req.query.get(String.self, at: "folder") {
+            path += subPath
         }
         
-        let subPath = try req.parameters.next(String.self)
-        
-        return try req.toJson(with: blogs(in: publicPath + subPath))
+        return try req.toJson(with: blogs(in: path))
     }
 }
