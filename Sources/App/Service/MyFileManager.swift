@@ -49,7 +49,7 @@ public final class MyFileMiddleware: Middleware, ServiceType {
         if path.pathExtension == "md" {
             return try req.fileio()
                 .read(file: filePath)
-                .map { String(data: $0, encoding: .utf8)! }
+                .map { String(data: $0, encoding: .utf8) ?? "" }
                 .map { try markdownToHTML($0) }
                 .map {
                     var http = HTTPResponse(status: .ok, body: $0)

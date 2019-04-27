@@ -122,9 +122,25 @@ extension Api.Path {
     }
 }
 
-// MARK: - Token
+// MARK: - Blog
 extension Api.Path {
-    
+    enum Blog: String, PathComponentsRepresentable {
+        case group = "blog"
+        case list
+        
+        var relativeValue: String {
+            switch self {
+            case .group:
+                return Api.Path.group.relativeValue + "/" + rawValue
+            default:
+                return type(of: self).group.relativeValue + "/" + rawValue
+            }
+        }
+        
+        func convertToPathComponents() -> [PathComponent] {
+            return [.init(stringLiteral: rawValue)]
+        }
+    }
 }
 
 // MARK: - Token

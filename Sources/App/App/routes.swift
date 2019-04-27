@@ -19,6 +19,7 @@ public func routes(_ router: Router) throws {
     try api.register(collection: AuthController())
     try api.register(collection: UserController())
     try api.register(collection: AccountController())
+    try api.register(collection: BlogController())
     
     try TodoController().boot(router: api)
 }
