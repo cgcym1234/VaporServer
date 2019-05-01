@@ -18,10 +18,13 @@ extension Api {
         case ok = 0  // 请求成功状态
         
         /// 接口失败
-        case userExist = 20
-        case userNotExist = 21
-        case passwordError = 22
-        case emailNotExist = 23
+        case userExist = 1000
+        case userNotExist = 1001
+        case passwordInvalid = 1002
+        case passwordError = 1003
+        case emailInvalid = 1008
+        case emailNotExist = 1009
+        
         case bookNotExist = 24
         case modelNotExist = 25
         case modelExisted = 26
@@ -41,10 +44,14 @@ extension Api {
                 return "用户已经存在"
             case .userNotExist:
                 return "用户不存在"
+            case .passwordInvalid:
+                return "密码不合法"
             case .passwordError:
                 return "密码错误"
             case .emailNotExist:
                 return "邮箱不存在"
+            case .emailInvalid:
+                return "邮箱不合法"
             case .bookNotExist:
                 return "书籍不存在"
             case .modelNotExist:
